@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+  margin:0;
+  padding:10px;
+  font-family:Arial;
+  background:#0b0e14;
+  color:#fff;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.card{
+  background:#141925;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.name{font-weight:bold;font-size:16px}
+.map{font-size:13px;opacity:.7}
+.id{font-size:12px;opacity:.5}
+
+.green{color:#2ecc71}
+.yellow{color:#f1c40f}
+.red{color:#e74c3c}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div>🟢 Online: <span id="count">0</span></div>
+  <select id="map" onchange="load()">
+    <option value="">Todos</option>
+    <option value="C01">C01</option>
+    <option value="C02">C02</option>
+  </select>
+</div>
+
+<div id="list"></div>
+
+<script>
+async function load(){
+  const map = document.getElementById("map").value;
+  const res = await fetch(
+    "https://script.google.com/macros/s/XXXXXXXX/exec?map="+map
+  );
+  const data = await res.json();
+
+  document.getElementById("count").innerText = data.count;
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.list.forEach(p=>{
+    let c="green";
+    if(p.ping>80)c="yellow";
+    if(p.ping>150)c="red";
+
+    list.innerHTML += `
+      <div class="card">
+        <div>
+          <div class="id">ID ${p.id}</div>
+          <div class="name">${p.name}</div>
+          <div class="map">Mapa ${p.map}</div>
+        </div>
+        <div class="${c}">
+          ${p.ping} ms
+        </div>
+      </div>
+    `;
+  });
+}
+
+load();
+setInterval(load,5000);
+</script>
+
+</body>
+</html>
